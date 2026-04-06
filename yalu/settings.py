@@ -1,6 +1,8 @@
 from django.urls import reverse_lazy
 from pathlib import Path
 import os
+import firebase_admin
+from firebase_admin import credentials
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -217,3 +219,9 @@ CORS_ALLOW_ALL_ORIGINS = True  # solo desarrollo
 REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
 }
+
+FIREBASE_KEY_PATH = BASE_DIR / 'yalu' / 'firebase_credentials.json'
+
+if not firebase_admin._apps:
+    cred = credentials.Certificate(str(FIREBASE_KEY_PATH))
+    firebase_admin.initialize_app(cred)
