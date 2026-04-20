@@ -17,7 +17,10 @@ class Pedido(models.Model):
         ("delivery", "Delivery propio"),
         ("courier", "Courier"),
     ]
-    usuario = models.ForeignKey(Usuario, on_delete=models.PROTECT)
+    usuario = models.ForeignKey(Usuario, on_delete=models.PROTECT, null=True, blank=True)
+    cliente_nombre = models.CharField(max_length=150, blank=True)
+    cliente_dni = models.CharField(max_length=8, blank=True)
+    cliente_correo = models.EmailField(blank=True)
     codigo = models.CharField(max_length=20, unique=True)
     estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default="pendiente")
     subtotal = models.DecimalField(max_digits=10, decimal_places=2)
