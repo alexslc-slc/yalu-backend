@@ -221,8 +221,8 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
 }
 
-FIREBASE_KEY_PATH = BASE_DIR / 'yalu' / 'firebase_credentials.json'
+#FIREBASE_KEY_PATH = BASE_DIR / 'yalu' / 'firebase_credentials.json'
 
-if not firebase_admin._apps:
-    cred = credentials.Certificate(str(FIREBASE_KEY_PATH))
-    firebase_admin.initialize_app(cred)
+#if not firebase_admin._apps:
+#    cred = credentials.Certificate(str(FIREBASE_KEY_PATH))
+#    firebase_admin.initialize_app(cred)
