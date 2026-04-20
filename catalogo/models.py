@@ -37,11 +37,20 @@ class Producto(models.Model):
     nombre = models.CharField(max_length=200)
     descripcion = models.TextField(blank=True)
     tipo_publicacion = models.CharField(max_length=20, choices=TIPO_CHOICES, default="producto")
-    precio_base = models.DecimalField(max_digits=10, decimal_places=2)
+    precio = models.DecimalField(max_digits=10, decimal_places=2)
     activo = models.BooleanField(default=True)
-    permite_mayor = models.BooleanField(default=False)
+    permite_mayor = models.BooleanField(default=False, help_text="Marcar si el producto puede venderse al por mayor (cantidad grande con precio especial)")
     stock_minimo = models.PositiveIntegerField(default=0)
     creado_en = models.DateTimeField(auto_now_add=True)
+
+    def stock_total(self):
+        return sum(v.stock for v in self.variantes.filter(activo=True))
+
+    def actualizar_estado(self):
+        tiene_stock = self.stock_total() > 0
+        if self.activo != tiene_stock:
+            self.activo = tiene_stock
+            self.save(update_fields=["activo"])
 
     def __str__(self):
         return self.nombre
@@ -54,10 +63,18 @@ class Producto(models.Model):
 class ProductoVariante(models.Model):
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE, related_name="variantes")
     nombre_variante = models.CharField(max_length=100)
-    precio = models.DecimalField(max_digits=10, decimal_places=2)
+    precio = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True,
+                                  help_text="Si no se especifica, usa el precio del producto")
     stock = models.PositiveIntegerField(default=0)
     sku = models.CharField(max_length=100, blank=True)
     activo = models.BooleanField(default=True)
+
+    def precio_final(self):
+        return self.precio if self.precio is not None else self.producto.precio
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        self.producto.actualizar_estado()
 
     def __str__(self):
         return f"{self.producto.nombre} — {self.nombre_variante}"
@@ -65,6 +82,35 @@ class ProductoVariante(models.Model):
     class Meta:
         verbose_name = "Variante"
         verbose_name_plural = "Variantes"
+
+
+class TipoVariante(models.Model):
+    producto = models.ForeignKey(Producto, on_delete=models.CASCADE, related_name="tipos_variante")
+    nombre = models.CharField(max_length=100, help_text="Ej: Color, Tamaño, Tipo")
+    obligatorio = models.BooleanField(default=False, help_text="¿El cliente debe elegir esta variante?")
+
+    def __str__(self):
+        return f"{self.producto.nombre} — {self.nombre}"
+
+    class Meta:
+        verbose_name = "Tipo de variante"
+        verbose_name_plural = "Tipos de variante"
+
+
+class OpcionVariante(models.Model):
+    tipo = models.ForeignKey(TipoVariante, on_delete=models.CASCADE, related_name="opciones")
+    nombre = models.CharField(max_length=100, help_text="Ej: Rojo, A4, Rayado")
+    precio_extra = models.DecimalField(max_digits=10, decimal_places=2, default=0,
+                                        help_text="Precio adicional sobre el precio base (0 = sin costo extra)")
+    stock = models.PositiveIntegerField(default=0)
+    activo = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f"{self.tipo.nombre}: {self.nombre}"
+
+    class Meta:
+        verbose_name = "Opción de variante"
+        verbose_name_plural = "Opciones de variante"
 
 
 class ImagenProducto(models.Model):

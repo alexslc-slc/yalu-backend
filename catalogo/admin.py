@@ -1,6 +1,17 @@
 from django.contrib import admin
 from unfold.admin import ModelAdmin, TabularInline
-from .models import Categoria, Marca, Producto, ProductoVariante, ImagenProducto
+from .models import Categoria, Marca, Producto, ProductoVariante, ImagenProducto, TipoVariante, OpcionVariante
+
+
+class OpcionVarianteInline(TabularInline):
+    model = OpcionVariante
+    extra = 1
+
+
+class TipoVarianteInline(TabularInline):
+    model = TipoVariante
+    extra = 1
+    show_change_link = True
 
 
 class VarianteInline(TabularInline):
@@ -29,7 +40,14 @@ class MarcaAdmin(ModelAdmin):
 
 @admin.register(Producto)
 class ProductoAdmin(ModelAdmin):
-    list_display = ["nombre", "categoria", "marca", "precio_base", "tipo_publicacion", "activo", "permite_mayor"]
+    list_display = ["nombre", "categoria", "marca", "precio", "tipo_publicacion", "activo", "permite_mayor"]
     list_filter = ["categoria", "marca", "activo", "tipo_publicacion"]
     search_fields = ["nombre", "descripcion"]
-    inlines = [VarianteInline, ImagenInline]
+    readonly_fields = ["activo"]
+    inlines = [VarianteInline, TipoVarianteInline, ImagenInline]
+
+
+@admin.register(TipoVariante)
+class TipoVarianteAdmin(ModelAdmin):
+    list_display = ["producto", "nombre", "obligatorio"]
+    inlines = [OpcionVarianteInline]
