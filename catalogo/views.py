@@ -25,7 +25,7 @@ class ProductoViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['categoria', 'marca', 'tipo_publicacion', 'activo']
     search_fields = ['nombre', 'descripcion']
-    ordering_fields = ['precio_base', 'creado_en', 'nombre']
+    ordering_fields = ['precio', 'creado_en', 'nombre']
     ordering = ['nombre']
 
     def get_queryset(self):
@@ -37,3 +37,8 @@ class ProductoViewSet(viewsets.ReadOnlyModelViewSet):
         if self.action == 'retrieve':
             return ProductoDetalleSerializer
         return ProductoListSerializer
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['request'] = self.request
+        return context
