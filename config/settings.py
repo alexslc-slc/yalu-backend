@@ -5,12 +5,10 @@ from dotenv import load_dotenv
 import firebase_admin
 from firebase_admin import credentials
 
-# 🔐 Cargar variables de entorno
-load_dotenv()
-
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# 🔐 SIN CLAVES EN CÓDIGO
+load_dotenv(BASE_DIR / ".env")
+
 SECRET_KEY = os.environ.get("SECRET_KEY")
 
 DEBUG = os.environ.get("DEBUG", "True") == "True"
@@ -217,18 +215,16 @@ UNFOLD = {
     },
 }
 
-CORS_ALLOW_ALL_ORIGINS = True  # solo desarrollo
+CORS_ALLOW_ALL_ORIGINS = True
 
 REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
 }
 
-# 🔐 FIREBASE (ruta segura)
 FIREBASE_KEY_PATH = os.environ.get("FIREBASE_KEY_PATH", str(BASE_DIR / 'firebase_credentials.json'))
 
 if not firebase_admin._apps:
     cred = credentials.Certificate(FIREBASE_KEY_PATH)
     firebase_admin.initialize_app(cred)
 
-# 🔐 HCAPTCHA (SIN CLAVE EN CÓDIGO)
 HCAPTCHA_SECRET = os.environ.get("HCAPTCHA_SECRET")
