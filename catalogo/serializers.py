@@ -44,7 +44,7 @@ class ProductoListSerializer(serializers.ModelSerializer):
         model = Producto
         fields = [
             'id', 'nombre', 'descripcion', 'tipo_publicacion',
-            'precio_base', 'activo', 'permite_mayor',
+            'precio', 'activo', 'permite_mayor',
             'categoria_nombre', 'marca_nombre',
             'imagen_principal', 'tiene_stock'
         ]
@@ -71,7 +71,7 @@ class ProductoDetalleSerializer(serializers.ModelSerializer):
         model = Producto
         fields = [
             'id', 'nombre', 'descripcion', 'tipo_publicacion',
-            'precio_base', 'activo', 'permite_mayor', 'stock_minimo',
+            'precio', 'activo', 'permite_mayor', 'stock_minimo',
             'categoria', 'marca', 'variantes', 'imagenes',
             'tiene_stock', 'creado_en'
         ]

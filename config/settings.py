@@ -1,14 +1,19 @@
 from django.urls import reverse_lazy
 from pathlib import Path
 import os
+from dotenv import load_dotenv
 import firebase_admin
 from firebase_admin import credentials
 
+# 🔐 Cargar variables de entorno
+load_dotenv()
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-v#5o&&u%j3@#dw7m6m8fnqp3@pw)*9cpb^%a_1)4j^7$e47m9_'
+# 🔐 SIN CLAVES EN CÓDIGO
+SECRET_KEY = os.environ.get("SECRET_KEY")
 
-DEBUG = True
+DEBUG = os.environ.get("DEBUG", "True") == "True"
 
 ALLOWED_HOSTS = []
 
@@ -87,9 +92,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# ========================
-# UNFOLD (CORRECTO)
-# ========================
 UNFOLD = {
     "SITE_TITLE": "Yalú Admin",
     "SITE_HEADER": "Librería Bazar Yalú",
@@ -221,8 +223,12 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
 }
 
-#FIREBASE_KEY_PATH = BASE_DIR / 'yalu' / 'firebase_credentials.json'
+# 🔐 FIREBASE (ruta segura)
+FIREBASE_KEY_PATH = os.environ.get("FIREBASE_KEY_PATH", str(BASE_DIR / 'firebase_credentials.json'))
 
-#if not firebase_admin._apps:
-#    cred = credentials.Certificate(str(FIREBASE_KEY_PATH))
-#    firebase_admin.initialize_app(cred)
+if not firebase_admin._apps:
+    cred = credentials.Certificate(FIREBASE_KEY_PATH)
+    firebase_admin.initialize_app(cred)
+
+# 🔐 HCAPTCHA (SIN CLAVE EN CÓDIGO)
+HCAPTCHA_SECRET = os.environ.get("HCAPTCHA_SECRET")
